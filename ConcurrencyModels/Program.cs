@@ -23,10 +23,12 @@ namespace ConcurrencyModels
 			var array = new int[ARRAY_SIZE];
 			ResetArray(array);
 
-			for (int i = 1; i <= 3; i++)
+			for (int i = 1; i <= 10; i++)
 			{
 				Console.WriteLine($"\n\n*********Run {i}***********\n\n");
 				Console.WriteLine($"Double Single Threaded: {Time(() => DoubleSingleThreaded(array)).TotalMilliseconds}ms Elapsed");
+				ResetArray(array);
+				Console.WriteLine($"Double Multi Threaded w/o Partitioning: {Time(() => DoubleMultiThreadedNoPartitioning(array)).TotalMilliseconds}ms Elapsed");
 				ResetArray(array);
 				Console.WriteLine($"Double Multi Threaded: {Time(() => DoubleMultiThreaded(array)).TotalMilliseconds}ms Elapsed");
 				ResetArray(array);
@@ -43,6 +45,11 @@ namespace ConcurrencyModels
 				Console.WriteLine(
 					$"Double CUDA, Multi Threaded: {Time(() => DoubleMultiThreadedCUDA(array)).TotalMilliseconds}ms Elapsed");
 			}
+		}
+
+		private static void DoubleMultiThreadedNoPartitioning(int[] array)
+		{
+			Parallel.ForEach(array, i => array[i] = i*2);
 		}
 
 
@@ -86,7 +93,7 @@ namespace ConcurrencyModels
 		{
 			var partitioner = Partitioner.Create(0, ARRAY_SIZE);
 		
-			Parallel.ForEach(partitioner.GetPartitions(Environment.ProcessorCount), p =>
+			Parallel.ForEach(partitioner.GetPartitions(Environment.ProcessorCount),  p =>
 			{
 				while (p.MoveNext())
 				{
@@ -110,7 +117,7 @@ namespace ConcurrencyModels
 				var lhs = new Vector<int>(array, i);
 
 				
-
+				
 				Vector.Multiply(lhs, 2).CopyTo(array, i);
 			}
 		}
