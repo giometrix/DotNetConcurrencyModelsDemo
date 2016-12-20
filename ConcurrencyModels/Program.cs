@@ -41,9 +41,7 @@ namespace ConcurrencyModels
 				ResetArray(array);
 				Console.WriteLine(
 					$"Double CUDA, Single Threaded: {Time(() => DoubleSingleThreadedCUDA(array)).TotalMilliseconds}ms Elapsed");
-				ResetArray(array);
-				Console.WriteLine(
-					$"Double CUDA, Multi Threaded: {Time(() => DoubleMultiThreadedCUDA(array)).TotalMilliseconds}ms Elapsed");
+			
 			}
 		}
 
@@ -53,19 +51,6 @@ namespace ConcurrencyModels
 		}
 
 
-		private static void DoubleMultiThreadedCUDA(int[] array)
-		{
-			var partitioner = Partitioner.Create(0, ARRAY_SIZE);
-
-			Parallel.ForEach(partitioner.GetPartitions(Environment.ProcessorCount), p =>
-			{
-				while (p.MoveNext())
-				{
-					
-					Gpu.Default.For(p.Current.Item1, p.Current.Item2, i => array[i] = i * 2);
-				}
-			});
-		}
 
 		private static void DoubleSingleThreadedCUDA(int[] array)
 		{
